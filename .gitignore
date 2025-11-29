@@ -1,0 +1,20 @@
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE/editor
+.vscode/
+*.code-workspace
+
+# Data and models
+face_data/
+classifier.xml
+
+# OS files
+.DS_Store
+Thumbs.db
