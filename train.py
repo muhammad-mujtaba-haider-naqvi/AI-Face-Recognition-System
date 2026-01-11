@@ -115,29 +115,62 @@ class train:
     #Train Data Functoin
     def train_data_classifier(self):
         data_directory = ("face_data")
-        path = [os.path.join(data_directory,file) for file in os.listdir(data_directory)]
-        
+        path = [os.path.join(data_directory, file) for file in os.listdir(data_directory) if os.path.isfile(os.path.join(data_directory, file))]
+
         faces = []
         ids = []
-        
-        for image in path:
-            img = Image.open(image).convert('L') # Converted In GrayScale
-            imageNP = np.array(img,'uint8')
-            id = int(os.path.split(image)[1].split('.')[1])
 
-            faces.append(imageNP)
-            ids.append(id)
-            cv2.imshow("Training",imageNP)
-            cv2.waitKey(1) == 13 
+        # Use Haar cascade to crop faces during training
+        face_cascade_path = "haarcascade_frontalface_default.xml"
+        face_cascade = cv2.CascadeClassifier(face_cascade_path) if os.path.exists(face_cascade_path) else None
+
+        TARGET_SIZE = (200, 200)
+
+        for image in path:
+            try:
+                img_pil = Image.open(image).convert('L')  # grayscale
+            except Exception:
+                continue
+            imageNP = np.array(img_pil, 'uint8')
+
+            # Robust ID extraction: expects filenames like anything.<id>.anything.jpg
+            try:
+                filename = os.path.split(image)[1]
+                parts = filename.split('.')
+                id = int(parts[1])
+            except Exception:
+                # Skip files that don't match the expected pattern
+                continue
+
+            # Detect and crop face if cascade available; else use full image
+            rois = []
+            if face_cascade is not None:
+                faces_rects = face_cascade.detectMultiScale(imageNP, 1.2, 5)
+                for (x, y, w, h) in faces_rects:
+                    rois.append(imageNP[y:y + h, x:x + w])
+            if not rois:
+                rois = [imageNP]
+
+            for roi in rois:
+                roi_resized = cv2.resize(roi, TARGET_SIZE)
+                faces.append(roi_resized)
+                ids.append(id)
+                cv2.imshow("Training", roi_resized)
+                if cv2.waitKey(1) == 13:
+                    pass
+
+        if not faces or not ids:
+            messagebox.showerror("Training Error", "No valid training data found in face_data. Check filenames and images.", parent=self.root)
+            return
 
         ids = np.array(ids)
 
         # =============================================Training Classifier===============================
         clf = cv2.face.LBPHFaceRecognizer_create()
-        clf.train(faces,ids)
+        clf.train(faces, ids)
         clf.write("classifier.xml")
         cv2.destroyAllWindows()
-        messagebox.showinfo("Result","Training Data Set Completed Successfully", parent = self.root)
+        messagebox.showinfo("Result", "Training Data Set Completed Successfully", parent=self.root)
 
 
 

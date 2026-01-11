@@ -149,6 +149,11 @@ class face_recognition:
 
     #======================Face Recognition Function====================
     def face_recognition_func(self):
+        # Tunable parameters
+        SCALE_FACTOR = 1.2
+        MIN_NEIGHBORS = 5
+        THRESHOLD_DISTANCE = 75  # Lower distance is better; accept if <= this
+
         def draw_boundary(img, classifier, scale_factor, min_neighbour, color, text, clf):
             gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             features = classifier.detectMultiScale(gray_img, scale_factor, min_neighbour)
@@ -156,9 +161,10 @@ class face_recognition:
 
             for (x, y, w, h) in features:
                 cv2.rectangle(img, (x, y), (x + w, y + h), color, 3)
-                id, predict = clf.predict(gray_img[y:y + h, x:x + w])
-                print(f"Predicted ID: {id}, Confidence Value: {predict}")
-                confidence = int(100 * (1 - predict / 300))
+                roi = gray_img[y:y + h, x:x + w]
+                id, distance = clf.predict(roi)
+                # For LBPH, smaller distance means better match
+                print(f"Predicted ID: {id}, Distance: {distance}")
 
                 try:
                     conn = mysql.connector.connect(
@@ -177,20 +183,22 @@ class face_recognition:
                     print("Database Error:", e)
                     # n, r, d = "DB Error", "N/A", "N/A"
 
-                if confidence > 82:
-                    cv2.putText(img, f"Roll No: {r}", (x, y - 55), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 3)
-                    cv2.putText(img, f"Name: {n}", (x, y - 30), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 3)
-                    cv2.putText(img, f"Department: {d}", (x, y - 5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 3)
+                if distance <= THRESHOLD_DISTANCE:
+                    cv2.putText(img, f"Roll No: {r}", (x, y - 55), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
+                    cv2.putText(img, f"Name: {n}", (x, y - 30), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
+                    cv2.putText(img, f"Department: {d}", (x, y - 5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
+                    cv2.putText(img, f"Match Dist: {distance:.2f}", (x, y + h + 20), cv2.FONT_HERSHEY_COMPLEX, 0.6, (255, 255, 255), 1)
                 else:
                     cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 3)
                     cv2.putText(img, "Unknown Face", (x, y - 10), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 3)
+                    cv2.putText(img, f"Dist: {distance:.2f}", (x, y + h + 20), cv2.FONT_HERSHEY_COMPLEX, 0.6, (255, 255, 255), 1)
 
                 coordinates = [x, y, w, h]
 
             return coordinates
 
         def recognize(img, clf, faceCascade):
-            coordinates = draw_boundary(img, faceCascade, 1.1, 10, (255, 255, 255), "Face", clf)
+            coordinates = draw_boundary(img, faceCascade, SCALE_FACTOR, MIN_NEIGHBORS, (255, 255, 255), "Face", clf)
             return img
 
         # Check if classifier.xml exists
