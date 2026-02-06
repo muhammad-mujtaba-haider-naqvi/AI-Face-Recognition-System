@@ -5,6 +5,8 @@ import cv2
 import os
 import mysql.connector
 import numpy as np
+import logging
+from attendance_manager import AttendanceManager
 
 
 class face_recognition:
@@ -16,6 +18,7 @@ class face_recognition:
         self.root = root
         self.fullscreen = True 
         self.video_cap = None  # will hold the active VideoCapture for cleanup
+        self.attendance_manager = None  # initialized when recognition starts
         self.root.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}+0+0")
         self.root.title("Face Recognition System")
         self.root.attributes("-fullscreen", self.fullscreen)
@@ -154,6 +157,14 @@ class face_recognition:
         MIN_NEIGHBORS = 5
         THRESHOLD_DISTANCE = 75  # Lower distance is better; accept if <= this
 
+        # Lazy init attendance manager to avoid startup DB hit unless needed
+        if self.attendance_manager is None:
+            try:
+                self.attendance_manager = AttendanceManager()
+            except Exception as e:
+                messagebox.showerror("Attendance Manager Error", f"Failed to initialize Attendance Manager: {e}")
+                return
+
         def draw_boundary(img, classifier, scale_factor, min_neighbour, color, text, clf):
             gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             features = classifier.detectMultiScale(gray_img, scale_factor, min_neighbour)
@@ -171,7 +182,7 @@ class face_recognition:
                         host="127.0.0.1", username="root", password="12345", database="FaceRecognitionSystem"
                     )
                     my_cursor = conn.cursor()
-                    my_cursor.execute("SELECT name, roll_no, department FROM student WHERE student_id = %s", (id,))
+                    my_cursor.execute("SELECT Name, Roll_No, Department FROM student WHERE Student_id = %s", (id,))
                     result = my_cursor.fetchone()
                     conn.close()
 
@@ -181,13 +192,23 @@ class face_recognition:
                         n, r, d = "Unknown", "N/A", "N/A"
                 except Exception as e:
                     print("Database Error:", e)
-                    # n, r, d = "DB Error", "N/A", "N/A"
 
                 if distance <= THRESHOLD_DISTANCE:
                     cv2.putText(img, f"Roll No: {r}", (x, y - 55), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
                     cv2.putText(img, f"Name: {n}", (x, y - 30), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
                     cv2.putText(img, f"Department: {d}", (x, y - 5), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
                     cv2.putText(img, f"Match Dist: {distance:.2f}", (x, y + h + 20), cv2.FONT_HERSHEY_COMPLEX, 0.6, (255, 255, 255), 1)
+                    # Auto-mark attendance without blocking the video loop
+                    if n != "Unknown" and r != "N/A":
+                        try:
+                            created = self.attendance_manager.mark_attendance(
+                                student_id=int(id), student_name=str(n), roll_no=str(r), detection_confidence=float(distance)
+                            )
+                            if created:
+                                cv2.putText(img, "Attendance Marked", (x, y + h + 40), cv2.FONT_HERSHEY_COMPLEX, 0.6, (0, 255, 0), 1)
+                        except Exception:
+                            # Silent fail to avoid UI disruption; logging is handled in manager
+                            pass
                 else:
                     cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 3)
                     cv2.putText(img, "Unknown Face", (x, y - 10), cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 3)

@@ -1,5 +1,9 @@
 from tkinter import *
+from tkinter import ttk, filedialog, messagebox
 from PIL import Image, ImageTk
+import csv
+from datetime import datetime, date
+from attendance_manager import AttendanceManager
 
 class attendance_management:
     def toggle_fullscreen(self, event=None):
@@ -82,23 +86,161 @@ class attendance_management:
             font=("times new roman", int(screen_width * 0.017), "bold")
         )
 
-        # === Support Contact Frame (Centered on Screen) ===
-        frame_width = int(screen_width * 0.4)
-        frame_height = int(screen_height * 0.1)
+        # === Attendance UI ===
+        self.att_mgr = AttendanceManager()
 
-        support_frame = Frame(lblBG, bg="white", bd=3, relief=RIDGE)
-        support_frame.place(relx=0.5, rely=0.55, anchor="center", width=frame_width, height=frame_height)
+        # Filters & Controls Frame - Professional styling with better spacing
+        controls_frame = Frame(lblBG, bg="white", bd=3, relief=GROOVE)
+        controls_frame.place(relx=0.025, rely=0.09, width=int(screen_width*0.95), height=int(screen_height*0.20))
 
-        padding_x = 20
-        padding_y = 8
-        label_font = ("times new roman", 17)
-        title_font = ("times new roman", 20, "bold")
+        # Title for controls section
+        title_label = Label(controls_frame, text="🔍 Search & Filter Attendance Records", 
+                           bg="white", fg="#800080", font=("Arial Rounded MT Bold", 14, "bold"))
+        title_label.grid(row=0, column=0, columnspan=9, pady=(8, 10), sticky=W+E)
 
-        support_title = Label(
-            support_frame, text="Feature coming soon. Stay tuned!",
-            font=title_font, bg="white", fg="#800080", pady=15
-        )
-        support_title.pack()
+        # Configure grid weights for responsive layout
+        for i in range(9):
+            controls_frame.grid_columnconfigure(i, weight=1)
+
+        # Row 1: Student ID, Roll No, Name
+        Label(controls_frame, text="Student ID:", bg="white", fg="#004080", 
+              font=("times new roman", 11, "bold")).grid(row=1, column=0, padx=8, pady=6, sticky=W)
+        self.var_student_id = StringVar()
+        student_id_entry = ttk.Entry(controls_frame, textvariable=self.var_student_id, width=16, font=("times new roman", 10))
+        student_id_entry.grid(row=1, column=1, padx=5, pady=6, sticky=W+E)
+
+        Label(controls_frame, text="Roll No:", bg="white", fg="#004080", 
+              font=("times new roman", 11, "bold")).grid(row=1, column=2, padx=8, pady=6, sticky=W)
+        self.var_roll_no = StringVar()
+        roll_entry = ttk.Entry(controls_frame, textvariable=self.var_roll_no, width=16, font=("times new roman", 10))
+        roll_entry.grid(row=1, column=3, padx=5, pady=6, sticky=W+E)
+
+        Label(controls_frame, text="Name:", bg="white", fg="#004080", 
+              font=("times new roman", 11, "bold")).grid(row=1, column=4, padx=8, pady=6, sticky=W)
+        self.var_name = StringVar()
+        name_entry = ttk.Entry(controls_frame, textvariable=self.var_name, width=18, font=("times new roman", 10))
+        name_entry.grid(row=1, column=5, columnspan=2, padx=5, pady=6, sticky=W+E)
+
+        # Row 2: Date Range
+        Label(controls_frame, text="Start Date:", bg="white", fg="#004080", 
+              font=("times new roman", 11, "bold")).grid(row=2, column=0, padx=8, pady=6, sticky=W)
+        self.var_start_date = StringVar()
+        start_entry = ttk.Entry(controls_frame, textvariable=self.var_start_date, width=16, font=("times new roman", 10))
+        start_entry.grid(row=2, column=1, padx=5, pady=6, sticky=W+E)
+
+        Label(controls_frame, text="End Date:", bg="white", fg="#004080", 
+              font=("times new roman", 11, "bold")).grid(row=2, column=2, padx=8, pady=6, sticky=W)
+        self.var_end_date = StringVar()
+        end_entry = ttk.Entry(controls_frame, textvariable=self.var_end_date, width=16, font=("times new roman", 10))
+        end_entry.grid(row=2, column=3, padx=5, pady=6, sticky=W+E)
+
+        Label(controls_frame, text="(Format: YYYY-MM-DD)", bg="white", fg="gray", 
+              font=("times new roman", 9, "italic")).grid(row=2, column=4, columnspan=2, padx=5, pady=6, sticky=W)
+
+        # Row 3: Sort controls
+        Label(controls_frame, text="Sort By:", bg="white", fg="#004080", 
+              font=("times new roman", 11, "bold")).grid(row=3, column=0, padx=8, pady=6, sticky=W)
+        self.sort_by = ttk.Combobox(controls_frame, state="readonly", 
+                                    values=["attendance_date","student_name","roll_no","student_id","recognized_at"], 
+                                    width=18, font=("times new roman", 10))
+        self.sort_by.current(0)
+        self.sort_by.grid(row=3, column=1, columnspan=2, padx=5, pady=6, sticky=W+E)
+
+        Label(controls_frame, text="Order:", bg="white", fg="#004080", 
+              font=("times new roman", 11, "bold")).grid(row=3, column=3, padx=8, pady=6, sticky=W)
+        self.sort_dir = ttk.Combobox(controls_frame, state="readonly", values=["DESC","ASC"], 
+                                     width=10, font=("times new roman", 10))
+        self.sort_dir.current(0)
+        self.sort_dir.grid(row=3, column=4, padx=5, pady=6, sticky=W)
+
+        # Action Buttons Frame - Styled buttons
+        btn_frame = Frame(controls_frame, bg="white")
+        btn_frame.grid(row=1, column=7, rowspan=3, columnspan=2, padx=10, pady=5, sticky=N+S+E+W)
+
+        search_btn = Button(btn_frame, text="🔍 Search", command=self.search_filter, 
+                           font=("Arial Rounded MT Bold", 11, "bold"), bg="#28a745", fg="white", 
+                           bd=0, padx=20, pady=8, cursor="hand2", relief=FLAT)
+        search_btn.pack(fill=X, pady=4)
+        search_btn.bind("<Enter>", lambda e: search_btn.config(bg="#218838"))
+        search_btn.bind("<Leave>", lambda e: search_btn.config(bg="#28a745"))
+
+        reset_btn = Button(btn_frame, text="↻ Reset", command=self.reset_filters, 
+                          font=("Arial Rounded MT Bold", 11, "bold"), bg="#17a2b8", fg="white", 
+                          bd=0, padx=20, pady=8, cursor="hand2", relief=FLAT)
+        reset_btn.pack(fill=X, pady=4)
+        reset_btn.bind("<Enter>", lambda e: reset_btn.config(bg="#138496"))
+        reset_btn.bind("<Leave>", lambda e: reset_btn.config(bg="#17a2b8"))
+
+        export_btn = Button(btn_frame, text="📥 Export CSV", command=self.export_csv, 
+                           font=("Arial Rounded MT Bold", 11, "bold"), bg="#007bff", fg="white", 
+                           bd=0, padx=20, pady=8, cursor="hand2", relief=FLAT)
+        export_btn.pack(fill=X, pady=4)
+        export_btn.bind("<Enter>", lambda e: export_btn.config(bg="#0056b3"))
+        export_btn.bind("<Leave>", lambda e: export_btn.config(bg="#007bff"))
+
+        delete_btn = Button(btn_frame, text="🗑 Delete Selected", command=self.delete_selected, 
+                           font=("Arial Rounded MT Bold", 11, "bold"), bg="#dc3545", fg="white", 
+                           bd=0, padx=20, pady=8, cursor="hand2", relief=FLAT)
+        delete_btn.pack(fill=X, pady=4)
+        delete_btn.bind("<Enter>", lambda e: delete_btn.config(bg="#c82333"))
+        delete_btn.bind("<Leave>", lambda e: delete_btn.config(bg="#dc3545"))
+
+        # Table Frame - Better positioned to avoid overlap
+        table_frame = Frame(lblBG, bg="white", bd=3, relief=GROOVE)
+        table_frame.place(relx=0.025, rely=0.31, width=int(screen_width*0.95), height=int(screen_height*0.59))
+
+        # Scrollbars
+        scroll_x = Scrollbar(table_frame, orient=HORIZONTAL)
+        scroll_y = Scrollbar(table_frame, orient=VERTICAL)
+        
+        # Table title bar
+        table_title = Label(table_frame, text="📋 Attendance Records", 
+                           bg="#f8f9fa", fg="#004080", font=("Arial Rounded MT Bold", 13, "bold"),
+                           bd=2, relief=RIDGE, padx=10, pady=8)
+        table_title.pack(side=TOP, fill=X)
+        
+        self.att_table = ttk.Treeview(table_frame,
+            columns=("id","student_id","roll_no","student_name","attendance_date","attendance_time","status","detection_confidence","marked_by","recognized_at"),
+            xscrollcommand=scroll_x.set, yscrollcommand=scroll_y.set)
+        scroll_x.pack(side=BOTTOM, fill=X)
+        scroll_y.pack(side=RIGHT, fill=Y)
+        scroll_x.config(command=self.att_table.xview)
+        scroll_y.config(command=self.att_table.yview)
+
+        # Headings with better styling
+        for col, text in [
+            ("id","ID"),("student_id","Student ID"),("roll_no","Roll No"),("student_name","Name"),
+            ("attendance_date","Date"),("attendance_time","Time"),("status","Status"),
+            ("detection_confidence","LBPH Dist"),("marked_by","Marked By"),("recognized_at","Recognized At")
+        ]:
+            self.att_table.heading(col, text=text)
+        self.att_table["show"] = "headings"
+
+        # Column widths - optimized for readability
+        widths = {
+            "id": 60, "student_id": 100, "roll_no": 100, "student_name": 180,
+            "attendance_date": 110, "attendance_time": 90, "status": 80,
+            "detection_confidence": 90, "marked_by": 100, "recognized_at": 150
+        }
+        for col, w in widths.items():
+            self.att_table.column(col, width=w, anchor=W)
+        
+        # Alternate row colors for better readability
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure("Treeview",
+                       background="white",
+                       foreground="black",
+                       rowheight=25,
+                       fieldbackground="white",
+                       font=("times new roman", 10))
+        style.map('Treeview', background=[('selected', '#0078d7')])
+        
+        self.att_table.pack(fill=BOTH, expand=TRUE, padx=5, pady=5)
+
+        # Data state
+        self.current_rows = []
+        self.search_filter()  # initial load
 
         
         # Back Button - Bottom Right Corner
@@ -113,6 +255,117 @@ class attendance_management:
             width=10
         )
         back_button.place(relx=0.95, rely=0.95, anchor="se")  
+
+    def parse_date(self, s: str):
+        s = (s or "").strip()
+        if not s:
+            return None
+        try:
+            return datetime.strptime(s, "%Y-%m-%d").date()
+        except Exception:
+            messagebox.showerror("Date Error", "Dates must be in YYYY-MM-DD format.", parent=self.root)
+            return None
+
+    def search_filter(self):
+        student_id = (self.var_student_id.get() or "").strip() or None
+        roll_no = (self.var_roll_no.get() or "").strip() or None
+        name = (self.var_name.get() or "").strip() or None
+        start_d = self.parse_date(self.var_start_date.get())
+        end_d = self.parse_date(self.var_end_date.get())
+        sort_by = self.sort_by.get()
+        sort_dir = self.sort_dir.get()
+
+        # Convert student_id to correct type (varchar kept as str)
+        try:
+            rows = self.att_mgr.get_attendance_records(
+                student_id=student_id,
+                student_name=name,
+                roll_no=roll_no,
+                start_date=start_d,
+                end_date=end_d,
+                sort_by=sort_by,
+                sort_dir=sort_dir,
+                limit=500,
+                offset=0
+            )
+        except Exception as e:
+            messagebox.showerror("DB Error", f"Failed to load attendance: {e}", parent=self.root)
+            return
+
+        self.current_rows = rows
+        self.att_table.delete(*self.att_table.get_children())
+        for r in rows:
+            self.att_table.insert("", END, values=(
+                r.get("id"), r.get("student_id"), r.get("roll_no"), r.get("student_name"),
+                r.get("attendance_date"), r.get("attendance_time"), r.get("status"),
+                r.get("detection_confidence"), r.get("marked_by"), r.get("recognized_at")
+            ))
+
+    def reset_filters(self):
+        self.var_student_id.set("")
+        self.var_roll_no.set("")
+        self.var_name.set("")
+        self.var_start_date.set("")
+        self.var_end_date.set("")
+        self.sort_by.set("attendance_date")
+        self.sort_dir.set("DESC")
+        self.search_filter()
+
+    def export_csv(self):
+        if not self.current_rows:
+            messagebox.showinfo("Export", "No rows to export.", parent=self.root)
+            return
+        fpath = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files","*.csv"), ("All files","*.*")],
+            initialfile=f"attendance_{date.today().isoformat()}.csv",
+            title="Save attendance CSV"
+        )
+        if not fpath:
+            return
+        try:
+            with open(fpath, "w", newline="", encoding="utf-8") as f:
+                writer = csv.writer(f)
+                writer.writerow(["id","student_id","roll_no","student_name","attendance_date","attendance_time","status","detection_confidence","marked_by","recognized_at"])
+                for r in self.current_rows:
+                    writer.writerow([
+                        r.get("id"), r.get("student_id"), r.get("roll_no"), r.get("student_name"),
+                        r.get("attendance_date"), r.get("attendance_time"), r.get("status"),
+                        r.get("detection_confidence"), r.get("marked_by"), r.get("recognized_at")
+                    ])
+            messagebox.showinfo("Export", f"CSV saved: {fpath}", parent=self.root)
+        except Exception as e:
+            messagebox.showerror("Export Error", f"Failed to save CSV: {e}", parent=self.root)
+
+    def delete_selected(self):
+        sel = self.att_table.selection()
+        if not sel:
+            messagebox.showinfo("Delete", "Select a row to delete.", parent=self.root)
+            return
+        # Support deleting multiple selections
+        confirm = messagebox.askyesno("Confirm Delete", "Delete selected attendance record(s)?", parent=self.root)
+        if not confirm:
+            return
+        deleted_any = False
+        for item in sel:
+            vals = self.att_table.item(item, 'values')
+            if not vals:
+                continue
+            rec_id = vals[0]
+            try:
+                rec_id_int = int(rec_id)
+            except Exception:
+                continue
+            ok = self.att_mgr.delete_attendance(rec_id_int)
+            if ok:
+                deleted_any = True
+                self.att_table.delete(item)
+                # Remove from current_rows cache
+                self.current_rows = [r for r in self.current_rows if r.get('id') != rec_id_int]
+        if deleted_any:
+            messagebox.showinfo("Delete", "Selected record(s) deleted.", parent=self.root)
+        else:
+            messagebox.showinfo("Delete", "No records deleted.", parent=self.root)
 
 
 
