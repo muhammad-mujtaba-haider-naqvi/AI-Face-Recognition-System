@@ -278,14 +278,41 @@ function updateStats(stats) {
   if (!stats) return;
 
   if (stats.students_registered !== undefined) {
-    document.getElementById('studentsRegistered').textContent = stats.students_registered;
+    animateCounter('studentsRegistered', stats.students_registered);
   }
   if (stats.face_samples !== undefined) {
-    document.getElementById('faceSamples').textContent = stats.face_samples;
+    animateCounter('faceSamples', stats.face_samples);
   }
   if (stats.today_attendance !== undefined) {
-    document.getElementById('todayAttendance').textContent = stats.today_attendance;
+    animateCounter('todayAttendance', stats.today_attendance);
   }
+}
+
+function animateCounter(elementId, finalValue) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+
+  const startValue = 0;
+  const duration = 2000; // 2 seconds animation
+  const startTime = performance.now();
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+  function animate(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easeProgress = easeOutCubic(progress);
+    const currentValue = Math.floor(startValue + (finalValue - startValue) * easeProgress);
+    
+    element.textContent = currentValue;
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      element.textContent = finalValue;
+    }
+  }
+
+  requestAnimationFrame(animate);
 }
 
 function setMockStats() {
