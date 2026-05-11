@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisionX - Where Vision Meets Intelligence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Sora:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Animated Background Elements -->
+  <div class="bg-elements">
+    <div class="particles-container" id="particlesContainer"></div>
+    <div class="grid-overlay"></div>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+    <div class="glow-orb glow-orb-3"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <span class="logo-glow"></span>
+        <span class="logo-text">VisionX</span>
+      </div>
+      
+      <ul class="nav-links">
+        <li><a href="#home" class="nav-link" data-section="home">Home</a></li>
+        <li><a href="#features" class="nav-link" data-section="features">Features</a></li>
+        <li><a href="#recognition" class="nav-link" data-section="recognition">Recognition</a></li>
+        <li><a href="#attendance" class="nav-link" data-section="attendance">Attendance</a></li>
+        <li><a href="#analytics" class="nav-link" data-section="analytics">Analytics</a></li>
+        <li><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
+      </ul>
+
+      <button class="nav-cta" id="legacyDashboardBtn">Legacy Dashboard</button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-subtitle-top">The Future of Attendance</div>
+        <h1 class="hero-title">
+          <span class="hero-title-word">Vision<span class="hero-accent">X</span></span>
+        </h1>
+        <p class="hero-tagline">Where Vision Meets Intelligence</p>
+        <p class="hero-description">
+          Experience the next generation of AI-powered face recognition. Secure, accurate, and intelligent attendance management for the modern era.
+        </p>
+        
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="markAttendanceBtn">
+            <span class="btn-glow"></span>
+            Start Recognition
+          </button>
+          <button class="btn btn-secondary" id="recordsBtn">
+            <span>View Analytics</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-visual">
+          <div class="scanner-frame">
+            <div class="scanner-head">
+              <div class="scanner-line"></div>
+              <div class="scanner-line"></div>
+            </div>
+            <img src="assets/hero.jpg" alt="AI Face Recognition" class="hero-image">
+            <div class="scanner-overlay">
+              <div class="scan-points">
+                <div class="point"></div>
+                <div class="point"></div>
+                <div class="point"></div>
+                <div class="point"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-label">Registered Students</span>
+        <span class="stat-value" id="studentsRegistered">0</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">Face Samples</span>
+        <span class="stat-value" id="faceSamples">0</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">Today Attendance</span>
+        <span class="stat-value" id="todayAttendance">0</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">System Status</span>
+        <span class="stat-value status-active">ACTIVE</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="section-header">
+      <h2>Advanced Features</h2>
+      <p>Next-generation AI capabilities for intelligent attendance</p>
+    </div>
+
+    <div class="features-grid">
+      <!-- Feature 1 -->
+      <div class="feature-block">
+        <div class="feature-image-wrapper">
+          <div class="feature-icon">🎯</div>
+          <p class="feature-overlay-text">AI Precision</p>
+        </div>
+        <h3>Precision Recognition</h3>
+        <p>Advanced facial recognition with 99.9% accuracy using LBPH algorithms optimized for real-time detection.</p>
+        <a href="#" class="feature-link">Learn More →</a>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-block">
+        <div class="feature-image-wrapper">
+          <div class="feature-icon">⚡</div>
+          <p class="feature-overlay-text">Real-Time Processing</p>
+        </div>
+        <h3>Real-Time Processing</h3>
+        <p>Instant face detection and recognition with sub-second latency for seamless attendance marking.</p>
+        <a href="#" class="feature-link">Learn More →</a>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-block">
+        <div class="feature-image-wrapper">
+          <div class="feature-icon">🔐</div>
+          <p class="feature-overlay-text">Secure Database</p>
+        </div>
+        <h3>Secure Database</h3>
+        <p>Enterprise-grade encryption and secure MySQL backend for sensitive attendance data protection.</p>
+        <a href="#" class="feature-link">Learn More →</a>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="feature-block">
+        <div class="feature-image-wrapper">
+          <div class="feature-icon">📊</div>
+          <p class="feature-overlay-text">Analytics Dashboard</p>
+        </div>
+        <h3>Analytics Dashboard</h3>
+        <p>Comprehensive reporting and analytics with visual insights into attendance patterns and trends.</p>
+        <a href="#" class="feature-link">Learn More →</a>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="feature-block">
+        <div class="feature-image-wrapper">
+          <div class="feature-icon">👥</div>
+          <p class="feature-overlay-text">Student Management</p>
+        </div>
+        <h3>Student Management</h3>
+        <p>Complete student profile management with dataset collection and facial model training capabilities.</p>
+        <a href="#" class="feature-link">Learn More →</a>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="feature-block">
+        <div class="feature-image-wrapper">
+          <div class="feature-icon">🚀</div>
+          <p class="feature-overlay-text">Enterprise Ready</p>
+        </div>
+        <h3>Enterprise Ready</h3>
+        <p>Scalable architecture designed for educational institutions and corporate environments.</p>
+        <a href="#" class="feature-link">Learn More →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Modules Section -->
+  <section class="modules" id="recognition">
+    <div class="section-header">
+      <h2>Core Modules</h2>
+      <p>Everything you need for intelligent attendance management</p>
+    </div>
+
+    <div class="modules-container">
+      <!-- Module 1: Student Registration -->
+      <div class="module-card" data-action="student">
+        <div class="module-number">01</div>
+        <div class="module-content">
+          <h3>Student Registration</h3>
+          <p>Register new students, collect facial datasets, and manage student information securely.</p>
+          <ul class="module-features">
+            <li>Profile Creation</li>
+            <li>Face Dataset Collection</li>
+            <li>Batch Import</li>
+            <li>Data Export</li>
+          </ul>
+        </div>
+        <button class="module-btn">Access Module →</button>
+      </div>
+
+      <!-- Module 2: Face Recognition -->
+      <div class="module-card" data-action="recognition">
+        <div class="module-number">02</div>
+        <div class="module-content">
+          <h3>Live Recognition</h3>
+          <p>Real-time face detection and attendance marking through camera-based recognition.</p>
+          <ul class="module-features">
+            <li>Live Camera Feed</li>
+            <li>Instant Detection</li>
+            <li>Auto Attendance</li>
+            <li>Confidence Scores</li>
+          </ul>
+        </div>
+        <button class="module-btn">Access Module →</button>
+      </div>
+
+      <!-- Module 3: Attendance Records -->
+      <div class="module-card" data-action="attendance">
+        <div class="module-number">03</div>
+        <div class="module-content">
+          <h3>Attendance Records</h3>
+          <p>View, filter, and export attendance records with advanced search and analytics.</p>
+          <ul class="module-features">
+            <li>Search Records</li>
+            <li>Filter by Date</li>
+            <li>Export Data</li>
+            <li>Generate Reports</li>
+          </ul>
+        </div>
+        <button class="module-btn">Access Module →</button>
+      </div>
+
+      <!-- Module 4: Training -->
+      <div class="module-card" data-action="training">
+        <div class="module-number">04</div>
+        <div class="module-content">
+          <h3>Model Training</h3>
+          <p>Train facial recognition models using collected datasets for improved accuracy.</p>
+          <ul class="module-features">
+            <li>Train LBPH</li>
+            <li>Batch Processing</li>
+            <li>Performance Metrics</li>
+            <li>Model Versioning</li>
+          </ul>
+        </div>
+        <button class="module-btn">Access Module →</button>
+      </div>
+
+      <!-- Module 5: Developer Panel -->
+      <div class="module-card" data-action="developer">
+        <div class="module-number">05</div>
+        <div class="module-content">
+          <h3>Developer Tools</h3>
+          <p>Advanced tools for system configuration and technical management.</p>
+          <ul class="module-features">
+            <li>System Settings</li>
+            <li>Database Config</li>
+            <li>Debug Mode</li>
+            <li>API Access</li>
+          </ul>
+        </div>
+        <button class="module-btn">Access Module →</button>
+      </div>
+
+      <!-- Module 6: Help Desk -->
+      <div class="module-card" data-action="helpdesk">
+        <div class="module-number">06</div>
+        <div class="module-content">
+          <h3>Help & Support</h3>
+          <p>Get assistance, documentation, and troubleshooting support.</p>
+          <ul class="module-features">
+            <li>Documentation</li>
+            <li>FAQ</li>
+            <li>Troubleshooting</li>
+            <li>Contact Support</li>
+          </ul>
+        </div>
+        <button class="module-btn">Access Module →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits" id="attendance">
+    <div class="section-header">
+      <h2>Why Choose VisionX</h2>
+      <p>Superior accuracy, reliability, and innovation</p>
+    </div>
+
+    <div class="benefits-grid">
+      <div class="benefit-item">
+        <div class="benefit-icon">✓</div>
+        <h4>99.9% Accuracy</h4>
+        <p>Industry-leading face recognition accuracy with continuous improvement.</p>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">✓</div>
+        <h4>Lightning Fast</h4>
+        <p>Sub-second recognition speed for seamless attendance marking.</p>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">✓</div>
+        <h4>Enterprise Secure</h4>
+        <p>Military-grade encryption for sensitive biometric data.</p>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">✓</div>
+        <h4>AI Powered</h4>
+        <p>Advanced machine learning for continuous accuracy improvement.</p>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">✓</div>
+        <h4>Easy Integration</h4>
+        <p>Seamless integration with existing systems and workflows.</p>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">✓</div>
+        <h4>24/7 Support</h4>
+        <p>Dedicated support team available round the clock.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Analytics Section -->
+  <section class="analytics" id="analytics">
+    <div class="section-header">
+      <h2>Intelligence Dashboard</h2>
+      <p>Real-time insights and performance metrics</p>
+    </div>
+
+    <div class="analytics-cards">
+      <div class="analytics-card">
+        <div class="analytics-header">System Performance</div>
+        <div class="analytics-value">98.5%</div>
+        <div class="analytics-label">Uptime</div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-header">Recognition Speed</div>
+        <div class="analytics-value">&lt;0.5s</div>
+        <div class="analytics-label">Average Response</div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-header">Data Processed</div>
+        <div class="analytics-value">10K+</div>
+        <div class="analytics-label">Monthly Recognitions</div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-header">User Satisfaction</div>
+        <div class="analytics-value">4.9/5</div>
+        <div class="analytics-label">Average Rating</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="contact">
+    <div class="footer-content">
+      <div class="footer-main">
+        <div class="footer-logo">
+          <span class="footer-logo-icon">✨</span>
+          <span>VisionX</span>
+        </div>
+        <p class="footer-tagline">Where Vision Meets Intelligence</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-column">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#recognition">Modules</a></li>
+            <li><a href="#analytics">Analytics</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">FAQ</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-social">
+        <a href="#" class="social-link">Twitter</a>
+        <a href="#" class="social-link">LinkedIn</a>
+        <a href="#" class="social-link">GitHub</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 VisionX. All rights reserved. | Powered by Advanced AI</p>
+    </div>
+  </footer>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="https://qwebchannel.qt.io/qwebchannel.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

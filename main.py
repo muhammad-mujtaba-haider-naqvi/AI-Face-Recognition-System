@@ -33,7 +33,7 @@ class Face_Recognition_System:
         header__height = int(screen_width / 3 / 3.85) # Common height
 
         # Image 1
-        img1 = Image.open(r"APP Pictures\headerLeft.JPG")
+        img1 = Image.open(r"APP Pictures\headerLeft.jpg")
         img1 = img1.resize((width1, header__height), Image.Resampling.LANCZOS)
         self.photoimg1 = ImageTk.PhotoImage(img1)
         lbl1 = Label(self.root, image=self.photoimg1, bd=0)

@@ -250,6 +250,25 @@ class AttendanceManager:
             logger.error("delete_attendance error: %s", e)
             return False
 
+    def delete_all_attendance(self) -> int:
+        """Delete all attendance records.
+
+        Returns the number of rows deleted (0 if none or on error).
+        """
+        sql = "DELETE FROM attendance"
+        try:
+            conn = self._get_conn()
+            cur = conn.cursor()
+            cur.execute(sql)
+            conn.commit()
+            affected = int(cur.rowcount or 0)
+            cur.close(); conn.close()
+            logger.info("All attendance records deleted: %s", affected)
+            return affected
+        except MySQLError as e:
+            logger.error("delete_all_attendance error: %s", e)
+            return 0
+
 
 # Example integration: importing here for documentation purposes
 EXAMPLE_INTEGRATION_SNIPPET = """

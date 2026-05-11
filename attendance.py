@@ -185,6 +185,13 @@ class attendance_management:
         delete_btn.bind("<Enter>", lambda e: delete_btn.config(bg="#c82333"))
         delete_btn.bind("<Leave>", lambda e: delete_btn.config(bg="#dc3545"))
 
+        clear_all_btn = Button(btn_frame, text="Clear All", command=self.delete_all,
+                   font=("Arial Rounded MT Bold", 11, "bold"), bg="#6c757d", fg="white",
+                   bd=0, padx=20, pady=8, cursor="hand2", relief=FLAT)
+        clear_all_btn.pack(fill=X, pady=4)
+        clear_all_btn.bind("<Enter>", lambda e: clear_all_btn.config(bg="#5a6268"))
+        clear_all_btn.bind("<Leave>", lambda e: clear_all_btn.config(bg="#6c757d"))
+
         # Table Frame - Better positioned to avoid overlap
         table_frame = Frame(lblBG, bg="white", bd=3, relief=GROOVE)
         table_frame.place(relx=0.025, rely=0.31, width=int(screen_width*0.95), height=int(screen_height*0.59))
@@ -364,6 +371,25 @@ class attendance_management:
                 self.current_rows = [r for r in self.current_rows if r.get('id') != rec_id_int]
         if deleted_any:
             messagebox.showinfo("Delete", "Selected record(s) deleted.", parent=self.root)
+        else:
+            messagebox.showinfo("Delete", "No records deleted.", parent=self.root)
+
+    def delete_all(self):
+        if not self.current_rows:
+            messagebox.showinfo("Delete", "No records to delete.", parent=self.root)
+            return
+        confirm = messagebox.askyesno(
+            "Confirm Delete",
+            "Delete ALL attendance records? This cannot be undone.",
+            parent=self.root
+        )
+        if not confirm:
+            return
+        deleted = self.att_mgr.delete_all_attendance()
+        if deleted > 0:
+            self.att_table.delete(*self.att_table.get_children())
+            self.current_rows = []
+            messagebox.showinfo("Delete", f"Deleted {deleted} record(s).", parent=self.root)
         else:
             messagebox.showinfo("Delete", "No records deleted.", parent=self.root)
 
